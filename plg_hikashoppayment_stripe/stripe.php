@@ -219,8 +219,8 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		catch(Exception $e)
 		{
 			$this->modifyOrder($order_id, $this->payment_params->invalid_status, true, true);
-			$this->app->redirect($cancel_url, 'Error charge : '.$e->getMessage());
 			$this->writeToLog($e->getMessage());
+			$this->app->redirect($cancel_url, 'Error charge : '.$e->getMessage());
 			return false;
 		}
 
