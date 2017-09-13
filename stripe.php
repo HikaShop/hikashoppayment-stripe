@@ -166,7 +166,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		//
 		$currency = $this->currency->currency_code;
 		$amout = round($dbOrder->order_full_price, 2) * 100;
-		$desc = 'PUB_'.$order_id;
+		$desc = $order_id;
 
 		StripeBridge::setApiKey(trim($this->payment_params->secret_key));
 		// StripeBridge::setApiVersion('2013-12-03');
