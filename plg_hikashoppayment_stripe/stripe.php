@@ -106,6 +106,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 			}
 		}
 
+		$vars['name'] = trim(@$order->cart->billing_address->address_firstname . ' ' . @$order->cart->billing_address->address_lastname);
 		$vars['address_line1'] = $address1;
 		$vars['address_line2'] = $address2;
 		$vars['address_zip'] = @$order->cart->billing_address->address_post_code;
