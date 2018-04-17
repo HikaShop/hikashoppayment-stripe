@@ -77,7 +77,7 @@ $doc->addScriptDeclaration($js);
 			</tr>
 			<tr>
 				<td></td>
-				<td colspan="2"><button type="submit" style="width:220px; height:28px; margin:auto; background: linear-gradient(rgb(69, 177, 232), rgb(48, 151, 222)) repeat scroll 0% 0% rgb(69, 177, 232); border-radius:4px; color:rgb(255,255,255);">Submit Payment</button></td>
+				<td colspan="2"><button type="submit" style="width:220px; height:28px; margin:auto; background: linear-gradient(rgb(69, 177, 232), rgb(48, 151, 222)) repeat scroll 0% 0% rgb(69, 177, 232); border-radius:4px; color:rgb(255,255,255);"><?php echo JText::_('HIKA_SUBMIT'); ?></button></td>
 			</tr>
 			</tbody>
 		</table>
