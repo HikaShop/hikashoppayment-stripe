@@ -43,8 +43,33 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 	/**
 	 *
 	 */
+	protected function checkRequirement()
+	{
+		static $check = null;
+		if($check !== null)
+			return $check;
+
+		if (version_compare(PHP_VERSION, '5.3.3') < 0) {
+			$app = JFactory::getApplication();
+			if($app->isAdmin())
+				$app->enqueueMessage('Stripe plugin requires PHP 5.3.3 or later', 'error');
+
+			$check = false;
+			return $check;
+		}
+	
+		$check = true;
+		return $check;
+	}
+	
+	/**
+	 *
+	 */
 	protected function init()
 	{
+		if(!$this->checkRequirement())
+			return false;
+
 		static $init = null;
 		if($init !== null)
 			return $init;
@@ -75,7 +100,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 	 */
 	public function onPaymentDisplay(&$order, &$methods, &$usable_methods)
 	{
-		if(!$this->init())
+		if(!$this->checkRequirement())
 			return false;
 		return parent::onPaymentDisplay($order, $methods, $usable_methods);
 	}
@@ -85,7 +110,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 	 */
 	public function onAfterOrderConfirm(&$order, &$methods, $method_id)
 	{
-		if(!$this->init())
+		if(!$this->checkRequirement())
 			return false;
 		parent::onAfterOrderConfirm($order, $methods, $method_id);
 		
@@ -129,7 +154,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 	 */
 	public function getPaymentDefaultValues(&$element)
 	{
-		if(!$this->init())
+		if(!$this->checkRequirement())
 			return false;
 
 		$element->payment_name = 'Stripe';
