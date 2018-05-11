@@ -29,6 +29,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		'debug' => array('DEBUG', 'boolean', '0'),
 		'return_url' => array('RETURN_URL', 'input'),
 		'invalid_status' => array('INVALID_STATUS', 'orderstatus'),
+		'pending_status' => array('PENDING_STATUS', 'orderstatus'),
 		'verified_status' => array('VERIFIED_STATUS', 'orderstatus')
 	);
 
@@ -74,15 +75,6 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		if($init !== null)
 			return $init;
 
-		if (version_compare(PHP_VERSION, '5.3.3') < 0) {
-			$app = JFactory::getApplication();
-			if($app->isAdmin())
-				$app->enqueueMessage('Stripe plugin requires PHP 5.3.3 or later', 'error');
-
-			$init = false;
-			return $init;
-		}
-
 		try {
 			include_once(dirname(__FILE__).'/lib/Stripe.php');
 			$init = true;
@@ -113,7 +105,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		if(!$this->checkRequirement())
 			return false;
 		parent::onAfterOrderConfirm($order, $methods, $method_id);
-		
+
 		$vars = array();
 		$address1 = '';
 		$address2 = '';
@@ -161,6 +153,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		$element->payment_description = 'You can pay by credit card using this payment method';
 		$element->payment_images = 'MasterCard,VISA,American_Express';
 		$element->payment_params->invalid_status = 'cancelled';
+		$element->payment_params->pending_status = 'pending';
 		$element->payment_params->verified_status = 'confirmed';
 	}
 
@@ -178,7 +171,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		$this->loadPaymentParams($dbOrder);
 		if(empty($this->payment_params))
 		{
-			$this->writeToLog('The system can\'t load the payment params');
+			echo 'The system can\'t load the payment params';
 			return false;
 		}
 		$this->loadOrderData($dbOrder);
@@ -245,9 +238,23 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		catch(Exception $e)
 		{
 			$this->modifyOrder($order_id, $this->payment_params->invalid_status, true, true);
+
 			$this->writeToLog(''.$e->getMessage());
 			$this->app->redirect($cancel_url, 'Error charge : '.$e->getMessage());
 			return false;
+		}
+
+		if(empty($charge->id) || empty($charge->status) || $charge->status == 'failed')
+			$this->modifyOrder($order_id, $this->payment_params->invalid_status, true, true);
+			$this->app->redirect($cancel_url);
+			return false;
+		}
+		if($charge->status != 'succeeded' || empty($charge->paid)) {
+			if(empty($this->payment_params->pending_status))
+				$this->payment_params->pending_status = 'created';
+			$this->modifyOrder($order_id, $this->payment_params->pending_status, true, true);
+			$this->app->redirect($return_url);
+			return true;
 		}
 
 		$this->modifyOrder($order_id, $this->payment_params->verified_status, true, true);
