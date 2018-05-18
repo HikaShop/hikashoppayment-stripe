@@ -182,7 +182,9 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 		//
 		//
 		$currency = $this->currency->currency_code;
-		$amout = round($dbOrder->order_full_price, 2) * 100;
+		$amount = round($dbOrder->order_full_price, 2) * 100;
+		if((int)$this->currency->currency_locale['int_frac_digits'] == 0)
+			$amount = round($dbOrder->order_full_price, 0);
 		$desc = JText::sprintf('ORDER_NUMBER').' : '.$order_id;
 
 		StripeBridge::setApiKey(trim($this->payment_params->secret_key));
@@ -221,14 +223,14 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 			// Make the charge
 			if(!empty($stripe_customer_id)) {
 				$charge = StripeBridge::Charge_create(array(
-					'amount' => $amout, // amount in cents, again
+					'amount' => $amount, // amount in cents, again
 					'currency' => $currency,
 					'description' => $desc,
 					'customer' => $stripe_customer_id
 				));
 			} else {
 				$charge = StripeBridge::Charge_create(array(
-					'amount' => $amout, // amount in cents, again
+					'amount' => $amount, // amount in cents, again
 					'currency' => $currency,
 					'description' => $desc,
 					'card' => $token
