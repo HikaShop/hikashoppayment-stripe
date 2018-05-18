@@ -244,7 +244,7 @@ class plgHikashoppaymentStripe extends hikashopPaymentPlugin
 			return false;
 		}
 
-		if(empty($charge->id) || empty($charge->status) || $charge->status == 'failed')
+		if(empty($charge->id) || empty($charge->status) || $charge->status == 'failed') {
 			$this->modifyOrder($order_id, $this->payment_params->invalid_status, true, true);
 			$this->app->redirect($cancel_url);
 			return false;
