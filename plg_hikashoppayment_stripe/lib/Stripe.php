@@ -90,7 +90,7 @@ require(dirname(__FILE__) . '/Stripe/TransferReversal.php');
  */
 class StripeBridge {
 	public static function setApiKey($data) { return \Stripe\Stripe::setApiKey($data); }
-	public static function setApiVersion($data) { return \Stripe\Strip::setApiVersion($data); }
+	public static function setApiVersion($data) { return \Stripe\Stripe::setApiVersion($data); }
 	public static function Charge_create($data) { return \Stripe\Charge::create($data); }
 	public static function Customer_create($data) { return \Stripe\Customer::create($data); }
 	public static function Customer_retrieve($data) { return \Stripe\Customer::retrieve($data); }
